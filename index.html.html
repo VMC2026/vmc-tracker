@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VMC AmeriCorps Daily Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #B22222;
+  --red-dark: #8B0000;
+  --red-light: #f9e8e8;
+  --navy: #1a2744;
+  --navy-light: #243460;
+  --gold: #C9922A;
+  --gold-light: #fdf3e3;
+  --white: #ffffff;
+  --off-white: #f8f7f5;
+  --gray-100: #f2f1ef;
+  --gray-200: #e4e2de;
+  --gray-400: #9e9b94;
+  --gray-600: #5a5750;
+  --gray-800: #2c2b28;
+  --success: #2d6a4f;
+  --success-light: #e8f5ee;
+  --warning: #92600a;
+  --warning-light: #fef3e2;
+  --danger: #B22222;
+  --danger-light: #fdf0f0;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  --radius: 6px;
+  --radius-lg: 10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Source Sans 3',sans-serif;background:var(--off-white);color:var(--gray-800);min-height:100vh;font-size:15px}
+.screen{display:none;min-height:100vh}
+.screen.active{display:block}
+
+/* AUTH */
+.auth-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--navy) 0%,var(--navy-light) 50%,var(--red-dark) 100%);padding:2rem}
+.auth-card{background:var(--white);border-radius:var(--radius-lg);padding:2.5rem;width:100%;max-width:420px;box-shadow:var(--shadow-lg)}
+.auth-logo{text-align:center;margin-bottom:1.5rem}
+.auth-logo img{height:90px;object-fit:contain}
+.auth-title{font-family:'Oswald',sans-serif;font-size:22px;font-weight:600;color:var(--navy);text-align:center;margin-bottom:4px;letter-spacing:.03em}
+.auth-sub{font-size:13px;color:var(--gray-400);text-align:center;margin-bottom:2rem}
+.form-group{margin-bottom:1.25rem}
+.form-group label{display:block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gray-600);margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-family:'Source Sans 3',sans-serif;font-size:15px;color:var(--gray-800);background:var(--white);transition:border-color .2s;outline:none}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--navy)}
+.form-group textarea{resize:vertical;min-height:80px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;border-radius:var(--radius);font-family:'Oswald',sans-serif;font-size:15px;font-weight:500;letter-spacing:.05em;cursor:pointer;border:none;transition:all .2s;text-decoration:none}
+.btn-primary{background:var(--red);color:var(--white);width:100%}
+.btn-primary:hover{background:var(--red-dark)}
+.btn-navy{background:var(--navy);color:var(--white)}
+.btn-navy:hover{background:var(--navy-light)}
+.btn-outline{background:transparent;color:var(--gray-600);border:1.5px solid var(--gray-200)}
+.btn-outline:hover{border-color:var(--gray-400);color:var(--gray-800)}
+.btn-sm{padding:7px 14px;font-size:13px}
+.btn-success{background:var(--success);color:var(--white)}
+.btn-danger{background:var(--red);color:var(--white)}
+.auth-switch{text-align:center;margin-top:1.25rem;font-size:13px;color:var(--gray-400)}
+.auth-switch a{color:var(--red);cursor:pointer;font-weight:600;text-decoration:none}
+
+/* NAV */
+.topnav{background:var(--navy);color:var(--white);display:flex;align-items:center;padding:0 1.5rem;height:60px;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-md)}
+.topnav-logo{display:flex;align-items:center;gap:10px}
+.topnav-logo img{height:36px;object-fit:contain}
+.topnav-title{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;letter-spacing:.04em;color:var(--white);line-height:1.2}
+.topnav-title span{display:block;font-size:11px;font-weight:400;color:rgba(255,255,255,.55);letter-spacing:.06em}
+.topnav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.user-badge{background:rgba(255,255,255,.12);border-radius:20px;padding:5px 12px;font-size:13px;color:rgba(255,255,255,.85)}
+.user-badge strong{color:var(--white);font-weight:600}
+
+/* TABS */
+.tabs{background:var(--white);border-bottom:2px solid var(--gray-200);display:flex;padding:0 1.5rem;overflow-x:auto}
+.tab{font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.05em;font-weight:500;color:var(--gray-400);padding:14px 18px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .2s}
+.tab:hover{color:var(--gray-800)}
+.tab.active{color:var(--red);border-bottom-color:var(--red)}
+
+/* LAYOUT */
+.main{padding:1.5rem;max-width:1100px;margin:0 auto}
+.dashboard-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:12px}
+.dashboard-header h2{font-family:'Oswald',sans-serif;font-size:22px;font-weight:600;color:var(--navy);letter-spacing:.03em}
+
+/* STATS */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:1.5rem}
+.stat-card{background:var(--white);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;box-shadow:var(--shadow-sm);border-left:4px solid var(--gray-200)}
+.stat-card.red{border-left-color:var(--red)}
+.stat-card.navy{border-left-color:var(--navy)}
+.stat-card.gold{border-left-color:var(--gold)}
+.stat-card.green{border-left-color:var(--success)}
+.stat-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:6px}
+.stat-value{font-family:'Oswald',sans-serif;font-size:36px;font-weight:700;color:var(--navy);line-height:1;margin-bottom:4px}
+.stat-meta{font-size:12px;color:var(--gray-400)}
+
+/* CARDS */
+.section-card{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);margin-bottom:1.25rem;overflow:hidden}
+.section-head{background:var(--navy);color:var(--white);padding:12px 1.5rem;display:flex;align-items:center;justify-content:space-between}
+.section-head h3{font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;letter-spacing:.05em}
+.section-body{padding:1.25rem 1.5rem}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:14px}
+.data-table th{font-family:'Oswald',sans-serif;font-size:12px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--gray-400);padding:8px 12px;text-align:left;border-bottom:1.5px solid var(--gray-200)}
+.data-table td{padding:10px 12px;border-bottom:1px solid var(--gray-100);color:var(--gray-800);vertical-align:top}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--off-white)}
+
+/* BADGES */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.badge-success{background:var(--success-light);color:var(--success)}
+.badge-warning{background:var(--warning-light);color:var(--warning)}
+.badge-danger{background:var(--danger-light);color:var(--danger)}
+.badge-navy{background:#e8ecf5;color:var(--navy)}
+.badge-gold{background:var(--gold-light);color:var(--gold)}
+
+/* LOG FORM */
+.log-section{border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);margin-bottom:1.25rem;overflow:hidden}
+.log-section-head{background:var(--gray-100);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid var(--gray-200)}
+.log-section-head h4{font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;letter-spacing:.05em;color:var(--navy)}
+.log-section-body{padding:1rem 1.25rem}
+.entry-row{display:grid;gap:10px;margin-bottom:10px;align-items:end}
+.entry-row.cols-3{grid-template-columns:1fr 1fr 1fr}
+.entry-row.cols-4{grid-template-columns:1fr 1fr 1fr auto}
+.entry-row.cols-2{grid-template-columns:1fr 1fr}
+.entry-item label{display:block;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gray-600);margin-bottom:5px}
+.entry-item input,.entry-item select,.entry-item textarea{width:100%;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-family:'Source Sans 3',sans-serif;font-size:14px;color:var(--gray-800);background:var(--white);outline:none;transition:border-color .2s}
+.entry-item input:focus,.entry-item select:focus,.entry-item textarea:focus{border-color:var(--navy)}
+.entry-item textarea{min-height:60px;resize:vertical}
+.add-row-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer;background:none;border:1.5px dashed var(--gray-200);border-radius:var(--radius);padding:7px 14px;width:100%;justify-content:center;transition:all .2s;margin-top:8px}
+.add-row-btn:hover{border-color:var(--navy);background:var(--gray-100)}
+.remove-btn{background:var(--red-light);border:none;color:var(--red);border-radius:var(--radius);padding:8px 10px;cursor:pointer;font-size:16px;line-height:1;transition:background .2s;align-self:end}
+.remove-btn:hover{background:#f5d0d0}
+
+/* COMPLIANCE */
+.compliance-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.compliance-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius);cursor:pointer;transition:all .2s}
+.compliance-item:hover{border-color:var(--gray-400)}
+.compliance-item.checked{border-color:var(--success);background:var(--success-light)}
+.check-icon{width:22px;height:22px;border-radius:50%;border:2px solid var(--gray-200);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .2s}
+.compliance-item.checked .check-icon{border-color:var(--success);background:var(--success);color:var(--white)}
+.compliance-label{font-size:13px;color:var(--gray-800);line-height:1.4}
+
+/* SUBMIT BAR */
+.submit-bar{background:var(--white);border-top:2px solid var(--gray-200);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;bottom:0;z-index:50;box-shadow:0 -4px 12px rgba(0,0,0,.06)}
+.submit-bar-info{font-size:13px;color:var(--gray-400)}
+.submit-bar-info strong{color:var(--gray-800)}
+
+/* LOG CARDS */
+.log-card{background:var(--white);border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden;transition:box-shadow .2s}
+.log-card:hover{box-shadow:var(--shadow-md)}
+.log-card-head{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--gray-100);cursor:pointer;gap:12px}
+.log-card-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.log-card-name{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;color:var(--navy)}
+.log-card-date{font-size:13px;color:var(--gray-400)}
+.log-card-site{font-size:12px;color:var(--gray-600);background:var(--gray-100);padding:2px 8px;border-radius:20px}
+.log-card-body{padding:1rem 1.25rem;display:none}
+.log-card-body.open{display:block}
+.log-mini-section{margin-bottom:1rem}
+.log-mini-section h5{font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--gray-100)}
+.mini-entry{background:var(--off-white);border-radius:var(--radius);padding:8px 12px;margin-bottom:6px;font-size:13px;line-height:1.5}
+.mini-entry strong{color:var(--navy)}
+.signoff-bar{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--gray-100);border-radius:var(--radius);margin-top:12px}
+
+/* RESUME PIPELINE */
+.resume-pipeline{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pipeline-col-head{font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:8px 14px;border-radius:var(--radius) var(--radius) 0 0}
+.pipeline-col-head.in-progress{background:var(--warning-light);color:var(--warning)}
+.pipeline-col-head.complete{background:var(--success-light);color:var(--success)}
+.resume-card{background:var(--white);border:1.5px solid var(--gray-200);border-radius:0 0 var(--radius) var(--radius);overflow:hidden}
+.resume-entry{padding:10px 14px;border-bottom:1px solid var(--gray-100);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.resume-entry:last-child{border-bottom:none}
+.resume-name{font-weight:600;font-size:14px;color:var(--navy)}
+.resume-meta{font-size:12px;color:var(--gray-400);margin-top:2px}
+.resume-followup{font-size:11px;color:var(--warning);margin-top:2px;font-weight:600}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:10px;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center}
+.filter-bar select,.filter-bar input{padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-family:'Source Sans 3',sans-serif;font-size:13px;color:var(--gray-800);background:var(--white);outline:none}
+
+/* ALERTS */
+.alert{padding:10px 14px;border-radius:var(--radius);font-size:13px;margin-bottom:1rem;display:none}
+.alert.show{display:block}
+.alert-error{background:var(--danger-light);color:var(--danger);border:1px solid #f5c0c0}
+.alert-success{background:var(--success-light);color:var(--success);border:1px solid #b0dfc4}
+.alert-info{background:#e8ecf5;color:var(--navy);border:1px solid #c0ccdf}
+
+/* LOADING */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:var(--white);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.today-chip{background:var(--red-light);color:var(--red);font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;letter-spacing:.04em}
+.empty-state{text-align:center;padding:2.5rem 1rem;color:var(--gray-400)}
+.empty-state .icon{font-size:32px;margin-bottom:8px}
+.empty-state p{font-size:14px}
+
+.date-filter{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--gray-600)}
+.date-filter select{padding:6px 10px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-family:'Source Sans 3',sans-serif;font-size:13px;color:var(--gray-800);background:var(--white);outline:none;cursor:pointer}
+
+@media(max-width:640px){
+  .entry-row.cols-3,.entry-row.cols-4,.entry-row.cols-2{grid-template-columns:1fr}
+  .compliance-grid{grid-template-columns:1fr}
+  .resume-pipeline{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div id="screen-landing" class="screen active">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <img src="VMC_Logo.JPG" alt="Veterans Multi-Service Center" onerror="this.style.display='none';document.getElementById('logo-fb').style.display='block'">
+        <div id="logo-fb" style="display:none;font-family:'Oswald',sans-serif;font-size:32px;font-weight:700;color:var(--navy)">VMC</div>
+      </div>
+      <div class="auth-title">AmeriCorps Activity Tracker</div>
+      <div class="auth-sub">Veterans Multi-Service Center — HVRP Program</div>
+      <div style="margin-top:1.5rem;display:flex;flex-direction:column;gap:10px">
+        <button class="btn btn-primary" onclick="showScreen('screen-member-login')">AmeriCorps Member Login</button>
+        <button class="btn btn-navy" onclick="showScreen('screen-supervisor-login')">Supervisor / Program Manager</button>
+      </div>
+      <div style="margin-top:1.25rem;text-align:center;font-size:12px;color:var(--gray-400)">
+        New member? <a style="color:var(--red);cursor:pointer;font-weight:600" onclick="showScreen('screen-register')">Register here</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div id="screen-register" class="screen">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo"><img src="VMC_Logo.JPG" alt="VMC" height="70" onerror="this.style.display='none'"></div>
+      <div class="auth-title">Member Registration</div>
+      <div class="auth-sub">Create your AmeriCorps member account</div>
+      <div id="reg-alert" class="alert alert-error"></div>
+      <div id="reg-loading" class="alert alert-info" style="display:none"><span class="spinner"></span> Creating account...</div>
+      <div class="form-group"><label>Full Name</label><input type="text" id="reg-name" placeholder="First Last"></div>
+      <div class="form-group">
+        <label>Site</label>
+        <select id="reg-site">
+          <option value="">Select site...</option>
+          <option value="Philadelphia">Philadelphia</option>
+          <option value="CPA">CPA — Central Pennsylvania</option>
+          <option value="DNJ">DNJ — District of New Jersey</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Start Date</label><input type="date" id="reg-start"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="reg-pass" placeholder="Create a password"></div>
+      <button class="btn btn-primary" id="reg-btn" onclick="registerMember()">Create Account</button>
+      <div class="auth-switch">Already have an account? <a onclick="showScreen('screen-member-login')">Sign in</a></div>
+      <div class="auth-switch" style="margin-top:6px"><a onclick="showScreen('screen-landing')">← Back</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- MEMBER LOGIN -->
+<div id="screen-member-login" class="screen">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo"><img src="VMC_Logo.JPG" alt="VMC" height="70" onerror="this.style.display='none'"></div>
+      <div class="auth-title">Member Sign In</div>
+      <div class="auth-sub">Log in to submit your daily activity report</div>
+      <div id="login-alert" class="alert alert-error"></div>
+      <div id="login-loading" class="alert alert-info" style="display:none"><span class="spinner"></span> Signing in...</div>
+      <div class="form-group"><label>Full Name</label><input type="text" id="login-name" placeholder="First Last"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="login-pass" placeholder="Your password"></div>
+      <button class="btn btn-primary" id="login-btn" onclick="memberLogin()">Sign In</button>
+      <div class="auth-switch">New member? <a onclick="showScreen('screen-register')">Register here</a></div>
+      <div class="auth-switch" style="margin-top:6px"><a onclick="showScreen('screen-landing')">← Back</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- SUPERVISOR LOGIN -->
+<div id="screen-supervisor-login" class="screen">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo"><img src="VMC_Logo.JPG" alt="VMC" height="70" onerror="this.style.display='none'"></div>
+      <div class="auth-title">Supervisor Access</div>
+      <div class="auth-sub">Program manager &amp; staff review portal</div>
+      <div id="sup-alert" class="alert alert-error"></div>
+      <div class="form-group"><label>Supervisor Password</label><input type="password" id="sup-pass" placeholder="Enter supervisor password" onkeydown="if(event.key==='Enter')supervisorLogin()"></div>
+      <button class="btn btn-navy" onclick="supervisorLogin()">Access Dashboard</button>
+      <div class="auth-switch"><a onclick="showScreen('screen-landing')">← Back</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- MEMBER LOG -->
+<div id="screen-member-log" class="screen">
+  <nav class="topnav">
+    <div class="topnav-logo">
+      <img src="VMC_Logo.JPG" alt="VMC" onerror="this.style.display='none'">
+      <div class="topnav-title">AmeriCorps Tracker <span>Daily Activity Log</span></div>
+    </div>
+    <div class="topnav-right">
+      <div class="user-badge" id="member-badge">Member</div>
+      <button class="btn btn-outline btn-sm" onclick="logout()">Sign Out</button>
+    </div>
+  </nav>
+  <div class="tabs">
+    <div class="tab active" onclick="memberTab('log')">Today's Log</div>
+    <div class="tab" onclick="memberTab('history')">My History</div>
+  </div>
+
+  <div id="member-tab-log" class="main">
+    <div class="dashboard-header">
+      <h2>Daily Activity Report</h2>
+      <span class="today-chip" id="log-date-chip"></span>
+    </div>
+    <div id="submit-success" class="alert alert-success">✓ Daily log submitted to Google Sheets. Your supervisor will review it.</div>
+    <div id="submit-error" class="alert alert-error"></div>
+    <div id="submit-loading" class="alert alert-info" style="display:none"><span class="spinner"></span> Submitting to Google Sheets...</div>
+
+    <!-- COMPUTER LAB -->
+    <div class="log-section">
+      <div class="log-section-head">
+        <h4>Computer Lab Assistance</h4>
+        <span class="badge badge-navy" id="lab-count-badge">0 veterans</span>
+      </div>
+      <div class="log-section-body">
+        <div id="lab-entries"></div>
+        <button class="add-row-btn" onclick="addLabEntry()">+ Add Veteran</button>
+      </div>
+    </div>
+
+    <!-- CLASSES -->
+    <div class="log-section">
+      <div class="log-section-head">
+        <h4>Classes &amp; Workshops Facilitated</h4>
+        <span class="badge badge-navy" id="class-count-badge">0 veterans</span>
+      </div>
+      <div class="log-section-body">
+        <div id="class-entries"></div>
+        <button class="add-row-btn" onclick="addClassEntry()">+ Add Class</button>
+      </div>
+    </div>
+
+    <!-- RESUME -->
+    <div class="log-section">
+      <div class="log-section-head">
+        <h4>Resume Support Sessions</h4>
+        <span class="badge badge-navy" id="resume-count-badge">0 veterans</span>
+      </div>
+      <div class="log-section-body">
+        <div id="resume-entries"></div>
+        <button class="add-row-btn" onclick="addResumeEntry()">+ Add Veteran</button>
+      </div>
+    </div>
+
+    <!-- COMPLIANCE -->
+    <div class="log-section">
+      <div class="log-section-head"><h4>Daily Compliance Confirmation</h4></div>
+      <div class="log-section-body">
+        <div class="compliance-grid">
+          <div class="compliance-item" onclick="toggleCompliance(this)" data-key="gear">
+            <div class="check-icon"></div>
+            <div class="compliance-label">Wearing AmeriCorps gear with visible logo all day</div>
+          </div>
+          <div class="compliance-item" onclick="toggleCompliance(this)" data-key="timesheet">
+            <div class="check-icon"></div>
+            <div class="compliance-label">Logged hours in OnCorps Reports today</div>
+          </div>
+          <div class="compliance-item" onclick="toggleCompliance(this)" data-key="conduct">
+            <div class="check-icon"></div>
+            <div class="compliance-label">No conduct violations or prohibited activities</div>
+          </div>
+          <div class="compliance-item" onclick="toggleCompliance(this)" data-key="direction">
+            <div class="check-icon"></div>
+            <div class="compliance-label">Followed staff directions throughout service</div>
+          </div>
+        </div>
+        <div style="margin-top:1rem">
+          <div class="entry-item">
+            <label>Notes / Incidents to Report (optional)</label>
+            <textarea id="compliance-notes" placeholder="Any issues, incidents, or observations for the supervisor..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="member-tab-history" class="main" style="display:none">
+    <div class="dashboard-header"><h2>My Submission History</h2></div>
+    <div id="member-history-loading" class="alert alert-info" style="display:none"><span class="spinner"></span> Loading from Google Sheets...</div>
+    <div id="member-history-list"></div>
+  </div>
+
+  <div class="submit-bar">
+    <div class="submit-bar-info"><strong id="submit-totals">0 veterans served today</strong> across all activities</div>
+    <button class="btn btn-primary" id="submit-btn" onclick="submitLog()">Submit Daily Log →</button>
+  </div>
+</div>
+
+<!-- SUPERVISOR DASHBOARD -->
+<div id="screen-supervisor" class="screen">
+  <nav class="topnav">
+    <div class="topnav-logo">
+      <img src="VMC_Logo.JPG" alt="VMC" onerror="this.style.display='none'">
+      <div class="topnav-title">AmeriCorps Tracker <span>Supervisor Dashboard</span></div>
+    </div>
+    <div class="topnav-right">
+      <div class="user-badge">Program Manager View</div>
+      <button class="btn btn-outline btn-sm" onclick="logout()">Sign Out</button>
+    </div>
+  </nav>
+  <div class="tabs">
+    <div class="tab active" onclick="supTab('dashboard')">Dashboard</div>
+    <div class="tab" onclick="supTab('logs')">Daily Logs</div>
+    <div class="tab" onclick="supTab('resumes')">Resume Pipeline</div>
+    <div class="tab" onclick="supTab('members')">Members</div>
+  </div>
+
+  <!-- DASHBOARD TAB -->
+  <div id="sup-tab-dashboard" class="main">
+    <div class="dashboard-header">
+      <h2>Program Impact Overview</h2>
+      <div class="date-filter">
+        <span>Show:</span>
+        <select id="dash-filter" onchange="renderDashboard()">
+          <option value="all">All time</option>
+          <option value="week">This week</option>
+          <option value="month" selected>This month</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="refreshAllData()">↻ Refresh</button>
+      </div>
+    </div>
+    <div id="dash-loading" class="alert alert-info" style="display:none"><span class="spinner"></span> Loading live data from Google Sheets...</div>
+    <div class="stat-grid" id="stat-grid"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25rem">
+      <div class="section-card">
+        <div class="section-head"><h3>Veterans Served by Site</h3></div>
+        <div class="section-body" id="site-breakdown"></div>
+      </div>
+      <div class="section-card">
+        <div class="section-head"><h3>Pending Supervisor Sign-offs</h3></div>
+        <div class="section-body" id="pending-signoffs"></div>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-head"><h3>Recent Activity — All Members</h3></div>
+      <div class="section-body">
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Member</th><th>Site</th><th>Lab</th><th>Class Vets</th><th>Resumes</th><th>Status</th><th></th></tr></thead>
+          <tbody id="recent-activity-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGS TAB -->
+  <div id="sup-tab-logs" class="main" style="display:none">
+    <div class="dashboard-header"><h2>All Daily Logs</h2></div>
+    <div class="filter-bar">
+      <select id="log-filter-site" onchange="renderLogs()">
+        <option value="">All sites</option>
+        <option value="Philadelphia">Philadelphia</option>
+        <option value="CPA">CPA</option>
+        <option value="DNJ">DNJ</option>
+      </select>
+      <select id="log-filter-member" onchange="renderLogs()">
+        <option value="">All members</option>
+      </select>
+      <select id="log-filter-status" onchange="renderLogs()">
+        <option value="">All statuses</option>
+        <option value="pending">Pending sign-off</option>
+        <option value="approved">Approved</option>
+      </select>
+    </div>
+    <div id="log-list"></div>
+  </div>
+
+  <!-- RESUMES TAB -->
+  <div id="sup-tab-resumes" class="main" style="display:none">
+    <div class="dashboard-header"><h2>Resume Support Pipeline</h2></div>
+    <div id="resume-pipeline-view"></div>
+  </div>
+
+  <!-- MEMBERS TAB -->
+  <div id="sup-tab-members" class="main" style="display:none">
+    <div class="dashboard-header"><h2>Registered Members</h2></div>
+    <div class="section-card">
+      <div class="section-body">
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Site</th><th>Start Date</th><th>Total Logs</th><th>Last Submission</th><th>Veterans Served</th></tr></thead>
+          <tbody id="members-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════
+const API = 'https://script.google.com/macros/s/AKfycbw6TNUYyhYMsmBCOCZ5LCacF-0GD41NhfScqBMkluuFpB_XzlPyuMSB_3dVoBwwTQnB/exec';
+const SUP_PASSWORD = 'VMC2025';
+
+// Sheet names
+const SHEETS = { members: 'Members', logs: 'DailyLogs', lab: 'LabEntries', classes: 'ClassEntries', resumes: 'ResumeEntries' };
+
+// In-memory cache
+let cache = { members: [], logs: [], lab: [], classes: [], resumes: [] };
+let currentMember = null;
+
+// ══════════════════════════════════════════════
+// API HELPERS
+// ══════════════════════════════════════════════
+async function sheetGet(sheetName) {
+  try {
+    const res = await fetch(`${API}?sheet=${encodeURIComponent(sheetName)}`);
+    const data = await res.json();
+    if (!data.rows || data.rows.length < 2) return [];
+    const headers = data.rows[0];
+    return data.rows.slice(1).map(row => {
+      const obj = {};
+      headers.forEach((h, i) => obj[h] = row[i] || '');
+      return obj;
+    });
+  } catch(e) { console.error('GET error', sheetName, e); return []; }
+}
+
+async function sheetPost(sheetName, headers, rowObj) {
+  const row = headers.map(h => rowObj[h] !== undefined ? rowObj[h] : '');
+  const payload = { sheet: sheetName, headers, row };
+  try {
+    await fetch(API, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return true;
+  } catch(e) { console.error('POST error', e); return false; }
+}
+
+async function refreshAllData() {
+  showDashLoading(true);
+  const [members, logs, lab, classes, resumes] = await Promise.all([
+    sheetGet(SHEETS.members),
+    sheetGet(SHEETS.logs),
+    sheetGet(SHEETS.lab),
+    sheetGet(SHEETS.classes),
+    sheetGet(SHEETS.resumes)
+  ]);
+  cache = { members, logs, lab, classes, resumes };
+  showDashLoading(false);
+  renderDashboard();
+}
+
+function showDashLoading(v) {
+  const el = document.getElementById('dash-loading');
+  if (el) el.style.display = v ? 'block' : 'none';
+}
+
+// ══════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function logout() { currentMember = null; showScreen('screen-landing'); }
+
+// ══════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════
+async function registerMember() {
+  const name = document.getElementById('reg-name').value.trim();
+  const site = document.getElementById('reg-site').value;
+  const start = document.getElementById('reg-start').value;
+  const pass = document.getElementById('reg-pass').value;
+  const alertEl = document.getElementById('reg-alert');
+  const loadEl = document.getElementById('reg-loading');
+  const btn = document.getElementById('reg-btn');
+
+  if (!name || !site || !start || !pass) { showAlert(alertEl, 'Please fill in all fields.'); return; }
+
+  btn.disabled = true;
+  loadEl.style.display = 'block';
+  alertEl.classList.remove('show');
+
+  // Check for duplicates
+  const existing = await sheetGet(SHEETS.members);
+  if (existing.find(m => m.Name && m.Name.toLowerCase() === name.toLowerCase())) {
+    showAlert(alertEl, 'A member with that name already exists.');
+    btn.disabled = false; loadEl.style.display = 'none'; return;
+  }
+
+  const headers = ['ID','Name','Site','StartDate','Password','RegisteredAt'];
+  await sheetPost(SHEETS.members, headers, {
+    ID: Date.now().toString(), Name: name, Site: site,
+    StartDate: start, Password: pass, RegisteredAt: new Date().toISOString()
+  });
+
+  btn.disabled = false; loadEl.style.display = 'none';
+  currentMember = { name, site, start };
+  launchMemberDashboard();
+}
+
+async function memberLogin() {
+  const name = document.getElementById('login-name').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const alertEl = document.getElementById('login-alert');
+  const loadEl = document.getElementById('login-loading');
+  const btn = document.getElementById('login-btn');
+
+  if (!name || !pass) { showAlert(alertEl, 'Please enter your name and password.'); return; }
+
+  btn.disabled = true; loadEl.style.display = 'block'; alertEl.classList.remove('show');
+
+  const members = await sheetGet(SHEETS.members);
+  const m = members.find(x => x.Name && x.Name.toLowerCase() === name.toLowerCase() && x.Password === pass);
+
+  btn.disabled = false; loadEl.style.display = 'none';
+
+  if (!m) { showAlert(alertEl, 'Name or password not found. Check your spelling or register.'); return; }
+  currentMember = { name: m.Name, site: m.Site, start: m.StartDate };
+  launchMemberDashboard();
+}
+
+function supervisorLogin() {
+  const pass = document.getElementById('sup-pass').value;
+  const alertEl = document.getElementById('sup-alert');
+  if (pass !== SUP_PASSWORD) { showAlert(alertEl, 'Incorrect supervisor password.'); return; }
+  showScreen('screen-supervisor');
+  refreshAllData();
+}
+
+function showAlert(el, msg) {
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 5000);
+}
+
+// ══════════════════════════════════════════════
+// MEMBER DASHBOARD
+// ══════════════════════════════════════════════
+function launchMemberDashboard() {
+  showScreen('screen-member-log');
+  document.getElementById('member-badge').innerHTML = `<strong>${currentMember.name}</strong> · ${currentMember.site}`;
+  const now = new Date();
+  document.getElementById('log-date-chip').textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  document.getElementById('lab-entries').innerHTML = '';
+  document.getElementById('class-entries').innerHTML = '';
+  document.getElementById('resume-entries').innerHTML = '';
+  document.getElementById('compliance-notes').value = '';
+  document.querySelectorAll('.compliance-item').forEach(el => { el.classList.remove('checked'); el.querySelector('.check-icon').textContent = ''; });
+  document.getElementById('submit-success').classList.remove('show');
+  document.getElementById('submit-error').classList.remove('show');
+  document.getElementById('submit-loading').style.display = 'none';
+  updateCounts();
+  memberTab('log');
+}
+
+function memberTab(t) {
+  document.querySelectorAll('#screen-member-log .tab').forEach((el,i) => el.classList.toggle('active',['log','history'][i]===t));
+  document.getElementById('member-tab-log').style.display = t==='log'?'block':'none';
+  document.getElementById('member-tab-history').style.display = t==='history'?'block':'none';
+  if (t==='history') renderMemberHistory();
+}
+
+// ══════════════════════════════════════════════
+// ENTRY BUILDERS
+// ══════════════════════════════════════════════
+function addLabEntry() {
+  const idx = 'lab' + Date.now();
+  const div = document.createElement('div');
+  div.className = 'entry-row cols-4'; div.id = idx;
+  div.innerHTML = `
+    <div class="entry-item"><label>Veteran Name</label><input type="text" placeholder="First Last"></div>
+    <div class="entry-item"><label>Time In</label><input type="time"></div>
+    <div class="entry-item"><label>Assistance Type</label>
+      <select><option value="">Select...</option><option>Job Application</option><option>Email Setup</option><option>Document Download</option><option>Resume Formatting</option><option>General Navigation</option><option>Other</option></select>
+    </div>
+    <button class="remove-btn" onclick="removeEntry('${idx}')">×</button>
+    <div class="entry-item" style="grid-column:1/3"><label>Notes</label><input type="text" placeholder="Brief description..."></div>
+    <div class="entry-item"><label>Follow-up Date</label><input type="date"></div>`;
+  document.getElementById('lab-entries').appendChild(div);
+  updateCounts();
+}
+
+function addClassEntry() {
+  const idx = 'cls' + Date.now();
+  const div = document.createElement('div');
+  div.className = 'entry-row cols-4'; div.id = idx;
+  div.innerHTML = `
+    <div class="entry-item"><label>Topic</label>
+      <select><option value="">Select topic...</option><option>Digital Skills — Basic Computer</option><option>Digital Skills — Internet & Email</option><option>Job Search Strategies</option><option>Resume Writing Workshop</option><option>Interview Preparation</option><option>LinkedIn & Online Presence</option><option>Benefits Navigation</option><option>Other</option></select>
+    </div>
+    <div class="entry-item"><label>Veterans Attending</label><input type="number" min="0" value="0" onchange="updateCounts()"></div>
+    <div class="entry-item"><label>Duration (mins)</label><input type="number" min="0" placeholder="60"></div>
+    <button class="remove-btn" onclick="removeEntry('${idx}')">×</button>
+    <div class="entry-item" style="grid-column:1/4"><label>Notes / Outcomes</label><input type="text" placeholder="What was covered..."></div>`;
+  document.getElementById('class-entries').appendChild(div);
+  updateCounts();
+}
+
+function addResumeEntry() {
+  const idx = 'res' + Date.now();
+  const div = document.createElement('div');
+  div.className = 'entry-row cols-4'; div.id = idx;
+  div.innerHTML = `
+    <div class="entry-item"><label>Veteran Name</label><input type="text" placeholder="First Last"></div>
+    <div class="entry-item"><label>Session Type</label>
+      <select><option value="">Select...</option><option>First Session</option><option>Follow-up Session</option><option>Final Review</option><option>Completed</option></select>
+    </div>
+    <div class="entry-item"><label>Follow-up Date</label><input type="date"></div>
+    <button class="remove-btn" onclick="removeEntry('${idx}')">×</button>
+    <div class="entry-item" style="grid-column:1/4"><label>Work Done This Session</label><input type="text" placeholder="e.g. Drafted objective, formatted work history..."></div>`;
+  document.getElementById('resume-entries').appendChild(div);
+  updateCounts();
+}
+
+function removeEntry(id) { const el = document.getElementById(id); if(el) el.remove(); updateCounts(); }
+
+function updateCounts() {
+  const labCount = document.getElementById('lab-entries').querySelectorAll('.entry-row').length;
+  const classVets = Array.from(document.getElementById('class-entries').querySelectorAll('input[type=number]')).reduce((s,el)=>s+(parseInt(el.value)||0),0);
+  const resumeCount = document.getElementById('resume-entries').querySelectorAll('.entry-row').length;
+  document.getElementById('lab-count-badge').textContent = labCount + ' veteran' + (labCount!==1?'s':'');
+  document.getElementById('class-count-badge').textContent = classVets + ' veteran' + (classVets!==1?'s':'');
+  document.getElementById('resume-count-badge').textContent = resumeCount + ' veteran' + (resumeCount!==1?'s':'');
+  const total = labCount + classVets + resumeCount;
+  document.getElementById('submit-totals').textContent = total + ' veteran' + (total!==1?'s':'') + ' served today';
+}
+
+function toggleCompliance(el) {
+  el.classList.toggle('checked');
+  el.querySelector('.check-icon').textContent = el.classList.contains('checked') ? '✓' : '';
+}
+
+// ══════════════════════════════════════════════
+// SUBMIT LOG
+// ══════════════════════════════════════════════
+async function submitLog() {
+  const errEl = document.getElementById('submit-error');
+  const sucEl = document.getElementById('submit-success');
+  const loadEl = document.getElementById('submit-loading');
+  const btn = document.getElementById('submit-btn');
+
+  // Validate compliance
+  const allChecked = Array.from(document.querySelectorAll('.compliance-item')).every(el => el.classList.contains('checked'));
+  if (!allChecked) { showAlert(errEl, 'Please confirm all compliance items before submitting.'); return; }
+
+  btn.disabled = true; loadEl.style.display = 'block';
+  errEl.classList.remove('show'); sucEl.classList.remove('show');
+
+  const logID = Date.now().toString();
+  const today = new Date().toISOString().split('T')[0];
+  const submittedAt = new Date().toISOString();
+
+  // Gather entries
+  const labRows = document.getElementById('lab-entries').querySelectorAll('.entry-row');
+  const labData = Array.from(labRows).map(row => {
+    const inp = row.querySelectorAll('input,select');
+    return { vetName: inp[0]?.value||'', timeIn: inp[1]?.value||'', type: inp[2]?.value||'', notes: inp[3]?.value||'', followUp: inp[4]?.value||'' };
+  });
+
+  const classRows = document.getElementById('class-entries').querySelectorAll('.entry-row');
+  const classData = Array.from(classRows).map(row => {
+    const inp = row.querySelectorAll('input,select');
+    return { topic: inp[0]?.value||'', count: parseInt(inp[1]?.value)||0, duration: inp[2]?.value||'', notes: inp[3]?.value||'' };
+  });
+
+  const resumeRows = document.getElementById('resume-entries').querySelectorAll('.entry-row');
+  const resumeData = Array.from(resumeRows).map(row => {
+    const inp = row.querySelectorAll('input,select');
+    return { vetName: inp[0]?.value||'', type: inp[1]?.value||'', followUp: inp[2]?.value||'', notes: inp[3]?.value||'' };
+  });
+
+  const labCount = labData.length;
+  const classVets = classData.reduce((s,c)=>s+c.count,0);
+  const resumeCount = resumeData.length;
+  const compNotes = document.getElementById('compliance-notes').value;
+
+  // Write main log row
+  const logHeaders = ['LogID','Date','MemberName','Site','LabCount','ClassVets','ResumeCount','ComplianceNotes','Status','SubmittedAt'];
+  await sheetPost(SHEETS.logs, logHeaders, {
+    LogID: logID, Date: today, MemberName: currentMember.name, Site: currentMember.site,
+    LabCount: labCount, ClassVets: classVets, ResumeCount: resumeCount,
+    ComplianceNotes: compNotes, Status: 'pending', SubmittedAt: submittedAt
+  });
+
+  // Write lab detail rows
+  const labHeaders = ['LogID','Date','MemberName','Site','VetName','TimeIn','AssistType','Notes','FollowUpDate'];
+  for (const e of labData) {
+    await sheetPost(SHEETS.lab, labHeaders, {
+      LogID: logID, Date: today, MemberName: currentMember.name, Site: currentMember.site,
+      VetName: e.vetName, TimeIn: e.timeIn, AssistType: e.type, Notes: e.notes, FollowUpDate: e.followUp
+    });
+  }
+
+  // Write class detail rows
+  const classHeaders = ['LogID','Date','MemberName','Site','Topic','VeteransAttending','DurationMins','Notes'];
+  for (const e of classData) {
+    await sheetPost(SHEETS.classes, classHeaders, {
+      LogID: logID, Date: today, MemberName: currentMember.name, Site: currentMember.site,
+      Topic: e.topic, VeteransAttending: e.count, DurationMins: e.duration, Notes: e.notes
+    });
+  }
+
+  // Write resume detail rows
+  const resumeHeaders = ['LogID','Date','MemberName','Site','VetName','SessionType','FollowUpDate','Notes'];
+  for (const e of resumeData) {
+    await sheetPost(SHEETS.resumes, resumeHeaders, {
+      LogID: logID, Date: today, MemberName: currentMember.name, Site: currentMember.site,
+      VetName: e.vetName, SessionType: e.type, FollowUpDate: e.followUp, Notes: e.notes
+    });
+  }
+
+  btn.disabled = false; loadEl.style.display = 'none';
+  sucEl.classList.add('show');
+  setTimeout(() => sucEl.classList.remove('show'), 6000);
+}
+
+// ══════════════════════════════════════════════
+// MEMBER HISTORY
+// ══════════════════════════════════════════════
+async function renderMemberHistory() {
+  const loadEl = document.getElementById('member-history-loading');
+  const listEl = document.getElementById('member-history-list');
+  loadEl.style.display = 'block';
+  const logs = await sheetGet(SHEETS.logs);
+  loadEl.style.display = 'none';
+  const mine = logs.filter(l => l.MemberName === currentMember.name).reverse();
+  if (!mine.length) { listEl.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>No submissions yet</p></div>'; return; }
+  listEl.innerHTML = mine.map(l => `
+    <div class="log-card">
+      <div class="log-card-head" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div class="log-card-meta">
+          <div class="log-card-name">${l.Date}</div>
+          <span class="log-card-site">${l.Site}</span>
+          <span class="badge ${l.Status==='approved'?'badge-success':'badge-warning'}">${l.Status}</span>
+        </div>
+        <div style="font-size:13px;color:var(--gray-400)">${l.LabCount} lab · ${l.ClassVets} class · ${l.ResumeCount} resume</div>
+      </div>
+      <div class="log-card-body">
+        <p style="font-size:13px;color:var(--gray-600)">Submitted: ${l.SubmittedAt ? new Date(l.SubmittedAt).toLocaleString() : '—'}</p>
+        ${l.ComplianceNotes ? `<div class="mini-entry" style="margin-top:8px;background:var(--warning-light);color:var(--warning)">Notes: ${l.ComplianceNotes}</div>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════
+// SUPERVISOR TABS
+// ══════════════════════════════════════════════
+function supTab(t) {
+  const tabs = ['dashboard','logs','resumes','members'];
+  document.querySelectorAll('#screen-supervisor .tab').forEach((el,i) => el.classList.toggle('active', tabs[i]===t));
+  tabs.forEach(tab => document.getElementById('sup-tab-'+tab).style.display = tab===t?'block':'none');
+  if (t==='dashboard') renderDashboard();
+  if (t==='logs') renderLogs();
+  if (t==='resumes') renderResumePipeline();
+  if (t==='members') renderMembers();
+}
+
+// ══════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════
+function filterLogs() {
+  const f = document.getElementById('dash-filter')?.value || 'all';
+  const now = new Date();
+  return cache.logs.filter(l => {
+    const d = new Date(l.Date);
+    if (f==='week') { const s=new Date(now); s.setDate(now.getDate()-now.getDay()); return d>=s; }
+    if (f==='month') return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+    return true;
+  });
+}
+
+function renderDashboard() {
+  const logs = filterLogs();
+  const totalLab = logs.reduce((s,l)=>s+(parseInt(l.LabCount)||0),0);
+  const totalClass = logs.reduce((s,l)=>s+(parseInt(l.ClassVets)||0),0);
+  const totalResume = logs.reduce((s,l)=>s+(parseInt(l.ResumeCount)||0),0);
+  const totalVets = totalLab + totalClass + totalResume;
+  const pending = logs.filter(l=>l.Status==='pending').length;
+
+  // Resume completions from detail sheet
+  const resumeCompleted = cache.resumes.filter(r => r.SessionType === 'Completed').length;
+  const resumeNames = new Set(cache.resumes.map(r=>r.VetName?.toLowerCase()).filter(Boolean));
+
+  document.getElementById('stat-grid').innerHTML = `
+    <div class="stat-card red"><div class="stat-label">Total Veterans Served</div><div class="stat-value">${totalVets}</div><div class="stat-meta">All activities combined</div></div>
+    <div class="stat-card navy"><div class="stat-label">Computer Lab Assists</div><div class="stat-value">${totalLab}</div><div class="stat-meta">Individual sessions</div></div>
+    <div class="stat-card gold"><div class="stat-label">Class Participants</div><div class="stat-value">${totalClass}</div><div class="stat-meta">Across all workshops</div></div>
+    <div class="stat-card green"><div class="stat-label">Resumes Completed</div><div class="stat-value">${resumeCompleted}</div><div class="stat-meta">${resumeNames.size} veterans in pipeline</div></div>
+    <div class="stat-card navy"><div class="stat-label">Logs Submitted</div><div class="stat-value">${logs.length}</div><div class="stat-meta">${pending} pending sign-off</div></div>`;
+
+  // Site breakdown
+  ['Philadelphia','CPA','DNJ'].forEach(site => {
+    const sl = logs.filter(l=>l.Site===site);
+    const v = sl.reduce((s,l)=>s+(parseInt(l.LabCount)||0)+(parseInt(l.ClassVets)||0)+(parseInt(l.ResumeCount)||0),0);
+    const mems = new Set(sl.map(l=>l.MemberName)).size;
+    document.getElementById('site-breakdown').innerHTML = ['Philadelphia','CPA','DNJ'].map(s => {
+      const sLogs = logs.filter(l=>l.Site===s);
+      const sv = sLogs.reduce((t,l)=>t+(parseInt(l.LabCount)||0)+(parseInt(l.ClassVets)||0)+(parseInt(l.ResumeCount)||0),0);
+      const sm = new Set(sLogs.map(l=>l.MemberName)).size;
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--gray-100)">
+        <div><div style="font-weight:600;font-size:14px;color:var(--navy)">${s}</div>
+        <div style="font-size:12px;color:var(--gray-400)">${sm} member${sm!==1?'s':''} · ${sLogs.length} log${sLogs.length!==1?'s':''}</div></div>
+        <div style="font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;color:var(--red)">${sv}</div></div>`;
+    }).join('') + `<div style="text-align:right;font-size:11px;color:var(--gray-400);margin-top:6px">veterans served</div>`;
+  });
+
+  // Pending
+  const pendingLogs = cache.logs.filter(l=>l.Status==='pending').slice(-5).reverse();
+  document.getElementById('pending-signoffs').innerHTML = pendingLogs.length
+    ? pendingLogs.map(l=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gray-100)">
+        <div><div style="font-weight:600;font-size:13px">${l.MemberName}</div>
+        <div style="font-size:12px;color:var(--gray-400)">${l.Date} · ${l.Site}</div></div>
+        <button class="btn btn-success btn-sm" onclick="approveLog('${l.LogID}')">Approve</button></div>`).join('')
+    : '<div class="empty-state"><p>All logs reviewed ✓</p></div>';
+
+  // Recent table
+  const recent = [...cache.logs].reverse().slice(0,10);
+  document.getElementById('recent-activity-body').innerHTML = recent.length
+    ? recent.map(l=>`<tr>
+        <td>${l.Date}</td><td style="font-weight:600">${l.MemberName}</td>
+        <td><span class="badge badge-navy">${l.Site}</span></td>
+        <td>${l.LabCount||0}</td><td>${l.ClassVets||0}</td><td>${l.ResumeCount||0}</td>
+        <td><span class="badge ${l.Status==='approved'?'badge-success':'badge-warning'}">${l.Status}</span></td>
+        <td>${l.Status!=='approved'?`<button class="btn btn-success btn-sm" onclick="approveLog('${l.LogID}')">Approve</button>`:''}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="8" style="text-align:center;color:var(--gray-400);padding:2rem">No logs submitted yet</td></tr>';
+}
+
+async function approveLog(logID) {
+  // Since we can't update a row via our simple API, we post an approval record
+  // and treat the latest status entry as current
+  const headers = ['LogID','ApprovedAt','ApprovedBy'];
+  await sheetPost('Approvals', headers, { LogID: logID, ApprovedAt: new Date().toISOString(), ApprovedBy: 'Supervisor' });
+  // Update cache optimistically
+  const idx = cache.logs.findIndex(l=>l.LogID===logID);
+  if (idx>-1) cache.logs[idx].Status = 'approved';
+  renderDashboard();
+  if (document.getElementById('sup-tab-logs').style.display !== 'none') renderLogs();
+}
+
+// ══════════════════════════════════════════════
+// LOGS VIEW
+// ══════════════════════════════════════════════
+function renderLogs() {
+  const site = document.getElementById('log-filter-site')?.value || '';
+  const member = document.getElementById('log-filter-member')?.value || '';
+  const status = document.getElementById('log-filter-status')?.value || '';
+
+  const members = [...new Set(cache.logs.map(l=>l.MemberName))];
+  const mSel = document.getElementById('log-filter-member');
+  const cur = mSel.value;
+  mSel.innerHTML = '<option value="">All members</option>' + members.map(m=>`<option value="${m}" ${m===cur?'selected':''}>${m}</option>`).join('');
+
+  let logs = [...cache.logs].filter(l => {
+    if (site && l.Site!==site) return false;
+    if (member && l.MemberName!==member) return false;
+    if (status && l.Status!==status) return false;
+    return true;
+  }).reverse();
+
+  const el = document.getElementById('log-list');
+  if (!logs.length) { el.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>No logs match the current filters</p></div>'; return; }
+
+  el.innerHTML = logs.map(l => {
+    const labDetail = cache.lab.filter(r=>r.LogID===l.LogID);
+    const clsDetail = cache.classes.filter(r=>r.LogID===l.LogID);
+    const resDetail = cache.resumes.filter(r=>r.LogID===l.LogID);
+    let detail = '';
+    if (labDetail.length) detail += `<div class="log-mini-section"><h5>Computer Lab (${labDetail.length})</h5>${labDetail.map(e=>`<div class="mini-entry"><strong>${e.VetName||'—'}</strong> · ${e.AssistType||'—'} ${e.TimeIn?'· '+e.TimeIn:''} ${e.Notes?'· '+e.Notes:''} ${e.FollowUpDate?'<span style="color:var(--warning)">↩ '+e.FollowUpDate+'</span>':''}</div>`).join('')}</div>`;
+    if (clsDetail.length) detail += `<div class="log-mini-section"><h5>Classes</h5>${clsDetail.map(e=>`<div class="mini-entry"><strong>${e.Topic||'—'}</strong> · ${e.VeteransAttending} veterans · ${e.DurationMins||'?'} min ${e.Notes?'· '+e.Notes:''}</div>`).join('')}</div>`;
+    if (resDetail.length) detail += `<div class="log-mini-section"><h5>Resume Sessions (${resDetail.length})</h5>${resDetail.map(e=>`<div class="mini-entry"><strong>${e.VetName||'—'}</strong> · ${e.SessionType||'—'} ${e.Notes?'· '+e.Notes:''} ${e.FollowUpDate?'<span style="color:var(--warning)">↩ '+e.FollowUpDate+'</span>':''}</div>`).join('')}</div>`;
+    if (l.ComplianceNotes) detail += `<div class="log-mini-section"><h5>Member Notes</h5><div class="mini-entry" style="background:var(--warning-light);color:var(--warning)">${l.ComplianceNotes}</div></div>`;
+
+    return `<div class="log-card">
+      <div class="log-card-head" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div class="log-card-meta">
+          <div class="log-card-name">${l.MemberName}</div>
+          <div class="log-card-date">${l.Date}</div>
+          <span class="log-card-site">${l.Site}</span>
+          <span class="badge ${l.Status==='approved'?'badge-success':'badge-warning'}">${l.Status}</span>
+        </div>
+        <div style="font-size:13px;color:var(--gray-400)">${l.LabCount||0} lab · ${l.ClassVets||0} class · ${l.ResumeCount||0} resume</div>
+      </div>
+      <div class="log-card-body">
+        ${detail || '<p style="font-size:13px;color:var(--gray-400)">No detail entries logged.</p>'}
+        <div class="signoff-bar">
+          <span style="font-size:13px;color:var(--gray-600);flex:1">Supervisor sign-off</span>
+          ${l.Status==='approved'
+            ? '<span class="badge badge-success">Approved ✓</span>'
+            : `<button class="btn btn-success btn-sm" onclick="approveLog('${l.LogID}');renderLogs()">Approve Log</button>`}
+          ${l.ComplianceNotes?'<span style="font-size:12px;color:var(--warning)">⚠ Member notes attached</span>':''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// RESUME PIPELINE
+// ══════════════════════════════════════════════
+function renderResumePipeline() {
+  const vets = {};
+  cache.resumes.forEach(r => {
+    if (!r.VetName) return;
+    const key = r.VetName.toLowerCase();
+    if (!vets[key]) vets[key] = { name: r.VetName, sessions: [], status: 'In Progress', followUp: '', member: r.MemberName, site: r.Site };
+    vets[key].sessions.push(r);
+    if (r.SessionType === 'Completed') vets[key].status = 'Completed';
+    if (r.FollowUpDate) vets[key].followUp = r.FollowUpDate;
+  });
+
+  const all = Object.values(vets);
+  const inProg = all.filter(v=>v.status!=='Completed');
+  const done = all.filter(v=>v.status==='Completed');
+
+  const el = document.getElementById('resume-pipeline-view');
+  if (!all.length) { el.innerHTML = '<div class="empty-state"><div class="icon">📄</div><p>No resume sessions logged yet</p></div>'; return; }
+
+  const card = v => `<div class="resume-entry">
+    <div>
+      <div class="resume-name">${v.name}</div>
+      <div class="resume-meta">${v.sessions.length} session${v.sessions.length!==1?'s':''} · ${v.member} · ${v.site}</div>
+      ${v.followUp?`<div class="resume-followup">↩ Follow-up: ${v.followUp}</div>`:''}
+    </div>
+    <span class="badge ${v.status==='Completed'?'badge-success':'badge-warning'}">${v.status}</span>
+  </div>`;
+
+  el.innerHTML = `<div class="resume-pipeline">
+    <div>
+      <div class="pipeline-col-head in-progress">In Progress — ${inProg.length} veteran${inProg.length!==1?'s':''}</div>
+      <div class="resume-card">${inProg.length?inProg.map(card).join(''):'<div class="empty-state"><p>None in progress</p></div>'}</div>
+    </div>
+    <div>
+      <div class="pipeline-col-head complete">Completed — ${done.length} veteran${done.length!==1?'s':''}</div>
+      <div class="resume-card">${done.length?done.map(card).join(''):'<div class="empty-state"><p>No completions yet</p></div>'}</div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// MEMBERS TABLE
+// ══════════════════════════════════════════════
+function renderMembers() {
+  const el = document.getElementById('members-table-body');
+  if (!cache.members.length) { el.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray-400);padding:2rem">No members registered yet</td></tr>'; return; }
+  el.innerHTML = cache.members.map(m => {
+    const mLogs = cache.logs.filter(l=>l.MemberName===m.Name);
+    const last = mLogs.length ? mLogs[mLogs.length-1].Date : '—';
+    const vets = mLogs.reduce((s,l)=>s+(parseInt(l.LabCount)||0)+(parseInt(l.ClassVets)||0)+(parseInt(l.ResumeCount)||0),0);
+    return `<tr>
+      <td style="font-weight:600">${m.Name}</td>
+      <td><span class="badge badge-navy">${m.Site}</span></td>
+      <td>${m.StartDate}</td>
+      <td>${mLogs.length}</td>
+      <td>${last}</td>
+      <td style="font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;color:var(--red)">${vets}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date().toISOString().split('T')[0];
+  document.querySelectorAll('input[type=date]').forEach(el => { if(!el.value) el.value = today; });
+});
+</script>
+</body>
+</html>
